@@ -345,3 +345,16 @@ CHIP ALU {
 }
 
 
+#PC 
+CHIP PC {
+    IN in[16], reset, load, inc;
+    OUT out[16];
+    
+    PARTS:
+    Inc16(in=outLoop , out=incOut );
+    Mux16(a=outLoop , b=incOut  , sel=inc , out=w1 );
+    Mux16(a=w1 , b=in , sel=load , out=w2 );
+    Mux16(a=w2 , b=false , sel=reset , out=w3 );
+    Register(in=w3 , load=true , out=outLoop, out=out );
+}
+
