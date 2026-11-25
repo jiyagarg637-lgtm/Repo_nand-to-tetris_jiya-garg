@@ -1,0 +1,19 @@
+// Computes the maximum of 5 and 3
+@5
+D=A
+@3
+D=D-A
+@10
+D;JGT
+@3
+D=A
+@12
+0;JMP
+(OUTPUT)
+@5
+D=A
+@12
+M=D
+(END)
+@END
+0;JMP
