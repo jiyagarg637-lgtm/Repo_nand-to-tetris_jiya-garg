@@ -492,3 +492,128 @@ CHIP PC {
     Register(in=w3 , load=true , out=outLoop, out=out );
 }
 
+#CPU
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+	
+    // A register input
+    Not(in=instruction[15], out=notC);
+    Or(a=notC, b=instruction[5], out=loadA);
+
+    Mux16(a=instruction, b=aluOut, sel=instruction[15], out=aInput);
+
+    ARegister(in=aInput, load=loadA, out=aReg, out[0..14]=addressM);
+
+    // D register
+    And(a=instruction[15], b=instruction[4], out=loadD);
+    DRegister(in=aluOut, load=loadD, out=dReg);
+
+    // Select ALU input
+    Mux16(a=aReg, b=inM, sel=instruction[12], out=aluY);
+
+    // ALU
+    ALU(
+        x=dReg,
+        y=aluY,
+        zx=instruction[11],
+        nx=instruction[10],
+        zy=instruction[9],
+        ny=instruction[8],
+        f=instruction[7],
+        no=instruction[6],
+        out=aluOut,
+        zr=zr,
+        ng=ng
+    );
+
+    // ALU output
+    Or16(a=aluOut, b=false, out=outM);
+
+    // Memory write
+    And(a=instruction[15], b=instruction[3], out=writeM);
+
+    // Jump conditions
+    And(a=instruction[15], b=instruction[2], out=jumpLT);
+    And(a=instruction[15], b=instruction[1], out=jumpEQ);
+    And(a=instruction[15], b=instruction[0], out=jumpGT);
+
+    And(a=jumpLT, b=ng, out=jlt);
+    And(a=jumpEQ, b=zr, out=jeq);
+
+    Not(in=ng, out=notNg);
+    Not(in=zr, out=notZr);
+    And(a=notNg, b=notZr, out=positive);
+    And(a=jumpGT, b=positive, out=jgt);
+
+    Or(a=jlt, b=jeq, out=jump1);
+    Or(a=jump1, b=jgt, out=jump);
+
+    // Program Counter
+    PC(in=aReg, load=jump, inc=true, reset=reset, out[0..14]=pc);
+
+}
+
+#Memory
+CHIP Memory {
+    IN in[16], load, address[15];
+    OUT out[16];
+
+    PARTS:
+
+    DMux(in=load, sel=address[14], a=ramLoad, b=ioLoad);
+
+    DMux(in=ioLoad, sel=address[13], a=screenLoad, b=keyboardLoad);
+
+    RAM16K(in=in, load=ramLoad, address=address[0..13], out=ramOut);
+
+    Screen(in=in, load=screenLoad, address=address[0..12], out=screenOut);
+
+    Keyboard(out=keyboardOut);
+
+    Mux16(a=screenOut, b=keyboardOut, sel=address[13], out=ioOut);
+
+    Mux16(a=ramOut, b=ioOut, sel=address[14], out=out);
+}
+#computer
+CHIP Computer {
+
+    IN reset;
+
+    PARTS:
+    
+    // Instruction memory
+    ROM32K(address=pc, out=instruction);
+
+    // CPU
+    CPU(
+        inM=inM,
+        instruction=instruction,
+        reset=reset,
+        outM=outM,
+        writeM=writeM,
+        addressM=addressM,
+        pc=pc
+    );
+
+    // Data memory
+    Memory(
+        in=outM,
+        load=writeM,
+        address=addressM,
+        out=inM
+    );
+
+}
+
