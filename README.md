@@ -616,4 +616,64 @@ CHIP Computer {
     );
 
 }
+#ABOUT CAPSTONE PROJECT
+# Nand2Tetris-I Capstone Project
+## Make the Computer Draw a Box
+
+**Student:** Jiya Garg  
+**Course:** B.Tech CSE – Data Science  
+**University:** K.R. Mangalam University  
+**K Value:** 37
+
+### Project Overview
+This project implements a Hack computer using the Nand2Tetris-I architecture and develops a Python-based two-pass assembler. The final program displays a rectangular box on the computer screen when a keyboard key is pressed.
+
+### Box Specifications
+- Starting row: 37
+- Height: 20 rows
+- Width: 64 pixels
+- Keyboard press: Displays the box
+- Keyboard release: Clears the box
+
+### Project Files
+
+**Hardware Implementation**
+- CPU.hdl
+- Memory.hdl
+- Computer.hdl
+
+**Assembler**
+- assembler.py
+
+**Assembly Test Programs**
+- Add.asm
+- Max.asm
+- Rect.asm
+- Pong.asm
+
+**Final Box Program**
+- Box.asm
+- Box.hack
+
+### Main Features
+1. Hack CPU, Memory and Computer implementation.
+2. Two-pass Python assembler.
+3. Symbol and variable handling.
+4. Invalid instruction error reporting.
+5. Duplicate label warning.
+6. Keyboard-controlled box drawing.
+
+### Testing
+Hardware test programs and assembler test programs were executed successfully. The final Box program was also tested in the CPU Emulator.
+
+### Tools Used
+- Nand2Tetris Web IDE
+- Google Colab
+- Python
+- Hack Assembly Language
+- GitHub
+
+### Conclusion
+This project demonstrates computer architecture, hardware description language, assembly programming, assembler development and interaction between keyboard input and screen output.
+
 
